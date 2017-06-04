@@ -114,7 +114,7 @@ namespace VRTK
             }
 
             bool validNavMeshLocation = false;
-            if (target)
+            if (target != null)
             {
                 NavMeshHit hit;
                 validNavMeshLocation = NavMesh.SamplePosition(destinationPosition, out hit, navMeshLimitDistance, NavMesh.AllAreas);
@@ -124,7 +124,42 @@ namespace VRTK
                 validNavMeshLocation = true;
             }
 
-            return (validNavMeshLocation && target && !(VRTK_PolicyList.Check(target.gameObject, targetListPolicy)));
+            return (validNavMeshLocation && target != null && !(VRTK_PolicyList.Check(target.gameObject, targetListPolicy)));
+        }
+
+        /// <summary>
+        /// The ForceTeleport/1 method forces the teleport to update position without needing to listen for a Destination Marker event.
+        /// </summary>
+        /// <param name="teleportArgs">The pseudo Destination Marker event for the teleport action.</param>
+        public virtual void ForceTeleport(DestinationMarkerEventArgs teleportArgs)
+        {
+            DoTeleport(this, teleportArgs);
+        }
+
+        /// <summary>
+        /// The ForceTeleport/3 method forces the teleport to update position without needing to listen for a Destination Marker event.
+        ///  It will build a destination marker out of the provided parameters.
+        /// </summary>
+        /// <param name="target">The Transform of the destination object.</param>
+        /// <param name="destinationPosition">The world position to teleport to.</param>
+        /// <param name="destinationRotation">The world rotation to teleport to.</param>
+        /// <param name="forceDestinationPosition">If true then the given destination position should not be altered by anything consuming the payload.</param>
+        public virtual void ForceTeleport(Transform target, Vector3 destinationPosition, Quaternion? destinationRotation = null, bool forceDestinationPosition = false)
+        {
+            DestinationMarkerEventArgs teleportArgs = new DestinationMarkerEventArgs();
+            teleportArgs.distance = Vector3.Distance(new Vector3(headset.position.x, playArea.position.y, headset.position.z), destinationPosition);
+            teleportArgs.target = target;
+            teleportArgs.raycastHit = new RaycastHit();
+            teleportArgs.destinationPosition = destinationPosition;
+            teleportArgs.destinationRotation = destinationRotation;
+            teleportArgs.forceDestinationPosition = forceDestinationPosition;
+            teleportArgs.enableTeleport = true;
+            ForceTeleport(teleportArgs);
+        }
+
+        protected virtual void Awake()
+        {
+            VRTK_SDKManager.instance.AddBehaviourToToggleOnLoadedSetupChange(this);
         }
 
         protected virtual void OnEnable()
@@ -147,6 +182,11 @@ namespace VRTK
             }
             InitDestinationMarkerListeners(false);
             VRTK_ObjectCache.registeredTeleporters.Remove(this);
+        }
+
+        protected virtual void OnDestroy()
+        {
+            VRTK_SDKManager.instance.RemoveBehaviourToToggleOnLoadedSetupChange(this);
         }
 
         protected virtual void Blink(float transitionSpeed)

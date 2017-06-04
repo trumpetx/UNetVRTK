@@ -69,6 +69,11 @@ namespace VRTK
             ResetPoint();
         }
 
+        protected virtual void Awake()
+        {
+            VRTK_SDKManager.instance.AddBehaviourToToggleOnLoadedSetupChange(this);
+        }
+
         protected override void OnEnable()
         {
             base.OnEnable();
@@ -107,6 +112,11 @@ namespace VRTK
             }
         }
 
+        protected virtual void OnDestroy()
+        {
+            VRTK_SDKManager.instance.RemoveBehaviourToToggleOnLoadedSetupChange(this);
+        }
+
         protected virtual void Update()
         {
             if (enableTeleport != currentTeleportState)
@@ -120,7 +130,7 @@ namespace VRTK
         {
             pointCollider = GetComponentInChildren<Collider>();
             createdCollider = false;
-            if (!pointCollider)
+            if (pointCollider == null)
             {
                 pointCollider = gameObject.AddComponent<SphereCollider>();
                 createdCollider = true;
@@ -133,7 +143,7 @@ namespace VRTK
         {
             pointRigidbody = GetComponent<Rigidbody>();
             createdRigidbody = false;
-            if (!pointRigidbody)
+            if (pointRigidbody == null)
             {
                 pointRigidbody = gameObject.AddComponent<Rigidbody>();
                 createdRigidbody = true;
@@ -164,7 +174,7 @@ namespace VRTK
 
         protected virtual void ManageDestinationMarkerListeners(GameObject markerMaker, bool register)
         {
-            if (markerMaker)
+            if (markerMaker != null)
             {
                 VRTK_DestinationMarker[] worldMarkers = markerMaker.GetComponentsInChildren<VRTK_DestinationMarker>();
                 for (int i = 0; i < worldMarkers.Length; i++)
@@ -197,7 +207,7 @@ namespace VRTK
                 isActive = true;
                 ToggleCursor(sender, false);
                 EnablePoint();
-                OnDestinationMarkerEnter(SetDestinationMarkerEvent(0f, e.raycastHit.transform, e.raycastHit, e.raycastHit.transform.position, e.controllerIndex, false, GetRotation()));
+                OnDestinationMarkerEnter(SetDestinationMarkerEvent(0f, e.raycastHit.transform, e.raycastHit, e.raycastHit.transform.position, e.controllerReference, false, GetRotation()));
             }
         }
 
@@ -208,7 +218,7 @@ namespace VRTK
                 isActive = false;
                 ToggleCursor(sender, true);
                 ResetPoint();
-                OnDestinationMarkerExit(SetDestinationMarkerEvent(0f, e.raycastHit.transform, e.raycastHit, e.raycastHit.transform.position, e.controllerIndex, false, GetRotation()));
+                OnDestinationMarkerExit(SetDestinationMarkerEvent(0f, e.raycastHit.transform, e.raycastHit, e.raycastHit.transform.position, e.controllerReference, false, GetRotation()));
             }
         }
 
@@ -236,7 +246,7 @@ namespace VRTK
             {
                 e.raycastHit.point = destinationLocation.position;
                 DisablePoint();
-                OnDestinationMarkerSet(SetDestinationMarkerEvent(e.distance, transform, e.raycastHit, destinationLocation.position, e.controllerIndex, false, GetRotation()));
+                OnDestinationMarkerSet(SetDestinationMarkerEvent(e.distance, transform, e.raycastHit, destinationLocation.position, e.controllerReference, false, GetRotation()));
             }
         }
 
@@ -293,7 +303,7 @@ namespace VRTK
 
         protected virtual void ToggleObject(GameObject givenObject, bool state)
         {
-            if (givenObject)
+            if (givenObject != null)
             {
                 givenObject.SetActive(state);
             }

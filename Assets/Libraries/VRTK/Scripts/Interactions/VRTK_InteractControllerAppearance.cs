@@ -1,4 +1,4 @@
-﻿// Interact Controller Appearance|Interactions|30080
+﻿// Interact Controller Appearance|Interactions|30040
 namespace VRTK
 {
     using UnityEngine;
@@ -14,18 +14,21 @@ namespace VRTK
     public class VRTK_InteractControllerAppearance : MonoBehaviour
     {
         [Header("Touch Visibility")]
+
         [Tooltip("Hides the controller model when a valid touch occurs.")]
         public bool hideControllerOnTouch = false;
         [Tooltip("The amount of seconds to wait before hiding the controller on touch.")]
         public float hideDelayOnTouch = 0f;
 
         [Header("Grab Visibility")]
+
         [Tooltip("Hides the controller model when a valid grab occurs.")]
         public bool hideControllerOnGrab = false;
         [Tooltip("The amount of seconds to wait before hiding the controller on grab.")]
         public float hideDelayOnGrab = 0f;
 
         [Header("Use Visibility")]
+
         [Tooltip("Hides the controller model when a valid use occurs.")]
         public bool hideControllerOnUse = false;
         [Tooltip("The amount of seconds to wait before hiding the controller on use.")]
@@ -127,13 +130,13 @@ namespace VRTK
             {
                 StopCoroutine(hideControllerRoutine);
             }
-            VRTK_SharedMethods.SetRendererVisible(interactingObject, ignoredObject);
+            VRTK_ObjectAppearance.SetRendererVisible(interactingObject, ignoredObject);
         }
 
         protected virtual IEnumerator HideController(GameObject interactingObject, GameObject ignoredObject, float delayTime)
         {
             yield return new WaitForSeconds(delayTime);
-            VRTK_SharedMethods.SetRendererHidden(interactingObject, ignoredObject);
+            VRTK_ObjectAppearance.SetRendererHidden(interactingObject, ignoredObject);
         }
     }
 }
