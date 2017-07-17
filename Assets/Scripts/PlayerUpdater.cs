@@ -82,7 +82,7 @@ namespace WizardArena
 
         void Update()
         {
-            if (isLocalPlayer)
+            if (isLocalPlayer && leftController != null && rightController != null)
             {
                     leftControllerRender.position = leftController.position;
                     rightControllerRender.position = rightController.position;
